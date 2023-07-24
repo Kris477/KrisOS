@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>KrisOS</title>
+  <link rel="stylesheet" href="https://unpkg.com/98.css">
+  <style>
+    .window {
+      position: absolute;
+      z-index: 1;
+      background-color: #fff;
+      border: 1px solid #000;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+      width: 300px;
+    }
+
+    .window-content {
+      padding: 10px;
+      height: 100%;
+    }
+
+    .window-footer {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="p-1 fixed bottom-0 left-0 w-full bg-gray-300 flex taskbar">
+    <button class="p-2" onclick="openWindow('https://kris477.github.io/KrisOS')">Restart</button>
+    <button class="p-2" onclick="openWindow('https://kris477.github.io/KrisOS/about.html')">About</button>
+  </div>
+
+  <script>
+    function openWindow(url) {
+      const windowElement = document.createElement('div');
+      windowElement.classList.add('window');
+      windowElement.style.top = '50px';
+      windowElement.style.left = '50px';
+      document.body.appendChild(windowElement);
+
+      const titleBar = document.createElement('div');
+      titleBar.classList.add('title-bar');
+      windowElement.appendChild(titleBar);
+
+      const titleText = document.createElement('div');
+      titleText.classList.add('title-bar-text');
+      titleText.textContent = 'Window Title'; // Set the title of the window here
+      titleBar.appendChild(titleText);
+
+      const titleBarControls = document.createElement('div');
+      titleBarControls.classList.add('title-bar-controls');
+      titleBar.appendChild(titleBarControls);
+
+      const minimizeButton = document.createElement('button');
+      minimizeButton.setAttribute('aria-label', 'Minimize');
+      minimizeButton.addEventListener('click', () => {
+        windowElement.style.display = 'none';
+      });
+      titleBarControls.appendChild(minimizeButton);
+
+      const maximizeButton = document.createElement('button');
+      maximizeButton.setAttribute('aria-label', 'Maximize');
+      maximizeButton.addEventListener('click', () => {
+        if (windowElement.classList.contains('window--maximized')) {
+          windowElement.classList.remove('window--maximized');
+        } else {
+          windowElement.classList.add('window--maximized');
+        }
+      });
+      titleBarControls.appendChild(maximizeButton);
+
+      const closeButton = document.createElement('button');
+      closeButton.setAttribute('aria-label', 'Close');
+      closeButton.addEventListener('click', () => {
+        windowElement.remove();
+      });
+      titleBarControls.appendChild(closeButton);
+
+      const windowContent = document.createElement('div');
+      windowContent.classList.add('window-content');
+      windowElement.appendChild(windowContent);
+
+      const iframe = document.createElement('iframe');
+      iframe.src = url;
+      windowContent.appendChild(iframe);
+
+      const windowFooter = document.createElement('div');
+      windowFooter.classList.add('window-footer');
+      windowElement.appendChild(windowFooter);
+
+      // Example buttons at the bottom of the window
+      const button1 = document.createElement('button');
+      button1.textContent = 'Button 1';
+      windowFooter.appendChild(button1);
+
+      const button2 = document.createElement('button');
+      button2.textContent = 'Button 2';
+      windowFooter.appendChild(button2);
+
+      // Enable movable and resizable functionality
+      dragElement(windowElement);
+      resizableElement(windowElement);
+    }
+
+    // Function to enable window dragging
+    function dragElement(elmnt) {
+      let pos1 = 0,
+        pos2 = 0,
+        pos3 = 0,
+        pos4 = 0;
+      elmnt.querySelector('.title-bar').onmousedown = dragMouseDown;
+
+      function dragMouseDown(e) {
+        e = e || window.event;
+        e.preventDefault();
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        document.onmousemove = elementDrag;
+      }
+
+      function elementDrag(e) {
+        e = e || window.event;
+        e.preventDefault();
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        elmnt.style.top = elmnt.offsetTop - pos2 + 'px';
+        elmnt.style.left = elmnt.offsetLeft - pos1 + 'px';
+      }
+
+      function closeDragElement() {
+        document.onmouseup = null;
+        document.onmousemove = null;
+      }
+    }
+
+    // Function to enable window resizing
+    function resizableElement(elmnt) {
+      const resizeHandle = document.createElement('div');
+      resizeHandle.classList.add('window-resize-handle');
+      elmnt.appendChild(resizeHandle);
+
+      resizeHandle.addEventListener('mousedown', initResize, false);
+
+      function initResize(e) {
+        e.preventDefault();
+        document.addEventListener('mousemove', resize, false);
+        document.addEventListener('mouseup', stopResize, false);
+      }
+
+      function resize(e) {
+        elmnt.style.width = e.clientX - elmnt.offsetLeft + 'px';
+      }
+
+      function stopResize() {
+        document.removeEventListener('mousemove', resize, false);
+        document.removeEventListener('mouseup', stopResize, false);
+      }
+    }
+  </script>
+</body>
+</html>
